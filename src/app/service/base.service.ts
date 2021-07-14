@@ -1,11 +1,12 @@
 import { HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { throwError } from "rxjs";
+import { environment } from "src/environments/environment";
 import { LocalStorageUtils } from "../utils/localstorage";
 
 export abstract class BaseService {
 
   public LocalStorage = new LocalStorageUtils();
-  protected UrlServiceV1: string = "https://localhost/apicore/api/v1/";
+  protected UrlServiceV1: string = environment.apiUrlv1;
 
   protected ObterHeaderJson() {
     return {
@@ -26,6 +27,12 @@ export abstract class BaseService {
 
       if (response.statusText === "Unknown Error") {
         customError.push("Ocorreu um erro desconhecido");
+      }
+      if (response.status === 400 && response.error.error.code === "UnsupportedApiVersion") {
+        customError.push("Ocorreu um erro. code: 001-UAV");
+      }
+
+      if (customError.length > 0) {
         response.error.errors = customError;
       }
     }
