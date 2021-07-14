@@ -94,7 +94,13 @@ export class CadastroComponent implements OnInit, AfterViewInit {
     this.errors = [];
 
     this.contaService.LocalStorage.salvarDadosLocaisUsuario(response);
-    let toast = this.toastr.success('Registro realizado com sucesso!', 'Seja bem vindo!!!');
+    let toast = this.toastr.success(
+      'Registro realizado com sucesso!',
+      'Seja bem vindo!!!',
+      {
+        timeOut: 2000,
+      }
+    );
     if (toast) {
       toast.onHidden
         .subscribe(() => {

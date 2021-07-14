@@ -23,6 +23,13 @@ export class ContaService extends BaseService {
   }
 
   login(usuario: Usuario) {
+    var response = this.httpClient
+      .post(`${this.UrlServiceV1}entrar`, usuario, this.ObterHeaderJson())
+      .pipe(
+        map(this.extractData),
+        catchError(this.serviceError)
+      );
 
+    return response;
   }
 }
