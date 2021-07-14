@@ -28,9 +28,10 @@
                 <div class="form-group">
                     <label class="control-label">Documento</label>
                     <div>
-                        <input class="form-control" id="documento" type="text" placeholder="(requerido)"
-                            formControlName="documento" [ngClass]="{'is-invalid': displayMessage.documento }" cpf
-                            [textMask]="{mask: MASKS.cpf.textMask}" />
+                        <input class="form-control" id="documento" type="text" placeholder="{{ textoDocumento }}"
+                            formControlName="documento"
+                            [textMask]="tipoFornecedorForm().value === '1' ? {mask: MASKS.cpf.textMask} : {mask: MASKS.cnpj.textMask}"
+                            [ngClass]="{'is-invalid': displayMessage.documento }" />
 
                         <span class="text-danger" *ngIf="displayMessage.documento">
                             <p [innerHTML]="displayMessage.documento"></p>
@@ -60,7 +61,9 @@
                         <label class="control-label">CEP</label>
                         <div>
                             <input class="form-control" id="cep" type="text" placeholder="CEP (requerido)"
-                                formControlName="cep" [ngClass]="{ 'is-invalid': displayMessage.cep }" />
+                                formControlName="cep" cep [textMask]="{mask: MASKS.cep.textMask}"
+                                [ngClass]="{ 'is-invalid': displayMessage.cep }" />
+
                             <span class="text-danger" *ngIf="displayMessage.cep">
                                 <p [innerHTML]="displayMessage.cep"></p>
                             </span>
