@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Observable, fromEvent, merge } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
+import { MASKS, NgBrazilValidators } from 'ng-brazil';
 
 import { ValidationMessages, GenericValidator, DisplayMessage } from 'src/app/utils/generic-form-validation';
 import { Fornecedor } from '../models/fornecedor';
@@ -26,6 +27,7 @@ export class NovoComponent implements OnInit {
   genericValidator: GenericValidator;
   displayMessage: DisplayMessage = {};
 
+  MASKS = MASKS;
   formResult: string = '';
 
   mudancasNaoSalvas: boolean;
@@ -41,6 +43,7 @@ export class NovoComponent implements OnInit {
       },
       documento: {
         required: 'Informe o Documento',
+        cpf: 'CPF em formato inválido'
       },
       logradouro: {
         required: 'Informe o Logradouro',
@@ -69,9 +72,24 @@ export class NovoComponent implements OnInit {
 
     this.fornecedorForm = this.fb.group({
       nome: ['', [Validators.required]],
-      documento: ['', [Validators.required]],
+      documento: ['', [Validators.required, NgBrazilValidators.cpf]],
       ativo: ['', [Validators.required]],
-      tipoFornecedor: ['', [Validators.required]]     
+      tipoFornecedor: ['', [Validators.required]],
+
+      endereco: this.fb.group({
+        logradouro: ['', [Validators.required]],
+        numero: ['', [Validators.required]],
+        complemento: [''],
+        bairro: ['', [Validators.required]],
+        cep: ['', [Validators.required]],
+        cidade: ['', [Validators.required]],
+        estado: ['', [Validators.required]]
+      })
+    });
+
+    this.fornecedorForm.patchValue({
+      tipoFornecedor: '1',
+      ativo: true
     });
   }
 
@@ -85,7 +103,7 @@ export class NovoComponent implements OnInit {
     });
   }
 
-   adicionarFornecedor() {
+  adicionarFornecedor() {
     if (this.fornecedorForm.dirty && this.fornecedorForm.valid) {
       this.fornecedor = Object.assign({}, this.fornecedor, this.fornecedorForm.value);
       this.formResult = JSON.stringify(this.fornecedor);
