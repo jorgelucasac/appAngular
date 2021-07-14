@@ -8,6 +8,14 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
 
 
+  //lazzy load
+  {
+    path: 'conta',
+    loadChildren: () => import('./conta/conta.module')
+      .then(m => m.ContaModule)
+  },
+
+
 
   { path: '**', component: NotFoundComponent }
 ];
