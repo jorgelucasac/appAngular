@@ -19,6 +19,8 @@ export class CadastroComponent implements OnInit, AfterViewInit {
   @ViewChildren(FormControlName, { read: ElementRef })
   formInputElements: ElementRef[];
 
+  possuiMudancasNaoSalvas: boolean;
+
   errors: any[] = [];
   cadastroForm: FormGroup;
   usuario: Usuario;
@@ -72,6 +74,7 @@ export class CadastroComponent implements OnInit, AfterViewInit {
 
     merge(...controlBlurs).subscribe(() => {
       this.displayMessage = this.genericValidator.processarMensagens(this.cadastroForm);
+      this.possuiMudancasNaoSalvas = true;
     });
   }
 
@@ -93,10 +96,12 @@ export class CadastroComponent implements OnInit, AfterViewInit {
     this.contaService.LocalStorage.salvarDadosLocaisUsuario(response);
     let toast = this.toastr.success('Registro realizado com sucesso!', 'Seja bem vindo!!!');
     if (toast) {
-      toast.onAction
+      toast.onHidden
         .subscribe(() => {
           this.router.navigate(['/home']);
-        })
+        });
+
+      this.possuiMudancasNaoSalvas = false;
     }
   }
 

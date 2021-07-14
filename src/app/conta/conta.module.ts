@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ContaService } from './services/conta.service';
 import { CustomFormsModule } from 'ng2-validation';
+import { ContaGuard } from './services/conta.guard';
 
 
 
@@ -39,7 +40,8 @@ import { CustomFormsModule } from 'ng2-validation';
   providers: [
 
     //criados
-    ContaService
+    ContaService,
+    ContaGuard
   ]
 })
 export class ContaModule { }
