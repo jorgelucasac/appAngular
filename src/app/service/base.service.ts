@@ -28,7 +28,7 @@ export abstract class BaseService {
       if (response.statusText === "Unknown Error") {
         customError.push("Ocorreu um erro desconhecido");
       }
-      if (response.status === 400 && response.error.error.code === "UnsupportedApiVersion") {
+      if (response.status === 400 && response.error?.error?.code === "UnsupportedApiVersion") {
         customError.push("Ocorreu um erro. code: 001-UAV");
       }
 
