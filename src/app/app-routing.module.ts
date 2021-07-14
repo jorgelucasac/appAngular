@@ -15,6 +15,12 @@ const routes: Routes = [
       .then(m => m.ContaModule)
   },
 
+  {
+    path: 'fornecedores',
+    loadChildren: () => import('./fornecedor/fornecedor.module')
+      .then(m => m.FornecedorModule)
+  },
+
 
 
   { path: '**', component: NotFoundComponent }
