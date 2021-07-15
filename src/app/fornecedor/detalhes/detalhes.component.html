@@ -22,7 +22,8 @@
                 <label class="control-label">Ativo</label>
             </dt>
             <dd class="col-sm-10">
-                <input [checked]="fornecedor.ativo" class="check-box" disabled="disabled" type="checkbox">
+                <span *ngIf="fornecedor.ativo" class="badge badge-pill badge-success">Sim</span>
+                <span *ngIf="!fornecedor.ativo" class="badge badge-pill badge-danger">Não</span>
             </dd>
         </dl>
 
