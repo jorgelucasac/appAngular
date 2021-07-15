@@ -6,7 +6,7 @@ import { catchError, map } from "rxjs/operators";
 
 import { BaseService } from 'src/app/service/base.service';
 import { Fornecedor } from '../models/fornecedor';
-import { CepConsulta } from "../models/endereco";
+import { CepConsulta, Endereco } from "../models/endereco";
 
 @Injectable()
 export class FornecedorService extends BaseService {
@@ -41,14 +41,26 @@ export class FornecedorService extends BaseService {
                 map(super.extractData),
                 catchError(super.serviceError));
     }
-
     atualizarFornecedor(fornecedor: Fornecedor): Observable<Fornecedor> {
-        return new Observable<Fornecedor>();
+        return this.http
+            .put(this.UrlServiceV1 + "fornecedores/" + fornecedor.id, fornecedor, super.ObterAuthHeaderJson())
+            .pipe(
+                map(super.extractData),
+                catchError(super.serviceError));
     }
 
     excluirFornecedor(id: string): Observable<Fornecedor> {
         return new Observable<Fornecedor>();
     }
+
+    atualizarEndereco(endereco: Endereco): Observable<Endereco> {
+        return this.http
+            .put(this.UrlServiceV1 + "fornecedores/endereco/" + endereco.id, endereco, super.ObterAuthHeaderJson())
+            .pipe(
+                map(super.extractData),
+                catchError(super.serviceError));
+    }
+
 
     consultarCep(cep: string): Observable<CepConsulta> {
         return this.http
