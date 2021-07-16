@@ -14,6 +14,8 @@ export class ExcluirComponent {
 
   fornecedor: Fornecedor = new Fornecedor();
   enderecoMap: any;
+  errors: any[] = [];
+
   constructor(
     private fornecedorService: FornecedorService,
     private route: ActivatedRoute,
@@ -33,7 +35,7 @@ export class ExcluirComponent {
     this.fornecedorService.excluirFornecedor(this.fornecedor.id)
       .subscribe(
         evento => { this.sucessoExclusao(evento) },
-        error => { this.falha() }
+        error => { this.falha(error) }
       );
   }
 
@@ -47,7 +49,8 @@ export class ExcluirComponent {
     }
   }
 
-  falha() {
+  falha(fail) {
+    this.errors = fail.error.errors;
     this.toastr.error('Houve um erro no processamento!', 'Ops! :(');
   }
 }
