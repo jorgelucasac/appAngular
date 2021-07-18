@@ -12,6 +12,7 @@ import { ValidationMessages, GenericValidator, DisplayMessage } from 'src/app/ut
 
 import { Produto, Fornecedor } from '../models/produto';
 import { ProdutoService } from '../services/produto.service';
+import { CurrencyUtils } from 'src/app/utils/currency-utils';
 
 
 @Component({
@@ -108,6 +109,10 @@ export class NovoComponent implements OnInit {
     if (this.produtoForm.dirty && this.produtoForm.valid) {
       this.produto = Object.assign({}, this.produto, this.produtoForm.value);
       this.formResult = JSON.stringify(this.produto);
+
+      this.produto.imagemUpload = this.croppedImage.split(',')[1];
+      this.produto.imagem = this.imagemNome;
+      this.produto.valor = CurrencyUtils.StringParaDecimal(this.produto.valor);
 
       this.produtoService.novoProduto(this.produto)
         .subscribe(
