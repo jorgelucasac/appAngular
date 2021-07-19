@@ -12,7 +12,7 @@ export class ContaGuard implements CanDeactivate<CadastroComponent>, CanActivate
   constructor(private router: Router) { }
 
   canDeactivate(component: CadastroComponent) {
-    if (component.possuiMudancasNaoSalvas) {
+    if (component.mudancasNaoSalvas) {
       return window.confirm('Você possui mudançãs não salvas! \nDeseja realmente sair?');
     }
     return true;

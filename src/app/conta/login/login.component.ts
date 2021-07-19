@@ -1,43 +1,36 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChildren } from '@angular/core';
-import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CustomValidators } from 'ng2-validation';
+import { Component, OnInit, ViewChildren, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormControlName } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+
 import { ToastrService } from 'ngx-toastr';
-import { fromEvent, merge, Observable } from 'rxjs';
-import { DisplayMessage, GenericValidator, ValidationMessages } from 'src/app/utils/generic-form-validation';
+
 import { Usuario } from '../models/usuario';
 import { ContaService } from '../services/conta.service';
+import { FormBaseComponent } from 'src/app/base-components/form-base.component';
+import { CustomValidators } from 'ng2-validation';
+
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styles: [
-  ]
+  templateUrl: './login.component.html'
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent extends FormBaseComponent implements OnInit {
 
-  @ViewChildren(FormControlName, { read: ElementRef })
-  formInputElements: ElementRef[];
-
-  possuiMudancasNaoSalvas: boolean;
+  @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
 
   errors: any[] = [];
   loginForm: FormGroup;
   usuario: Usuario;
+
   returnUrl: string;
 
-  validationMessages: ValidationMessages;
-  genericValidator: GenericValidator;
-  displayMessage: DisplayMessage = {};
-
-  constructor(
-    private fb: FormBuilder,
+  constructor(private fb: FormBuilder,
     private contaService: ContaService,
-    private activateRoute: ActivatedRoute,
     private router: Router,
-    private toastr: ToastrService
-  ) {
+    private route: ActivatedRoute,
+    private toastr: ToastrService) {
 
+    super();
 
     this.validationMessages = {
       email: {
@@ -50,34 +43,27 @@ export class LoginComponent implements OnInit, AfterViewInit {
       }
     };
 
-    this.returnUrl = this.activateRoute.snapshot.queryParams['returnUrl'];
-    console.log(this.returnUrl);
-    this.genericValidator = new GenericValidator(this.validationMessages);
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
 
+    super.configurarMensagensValidacaoBase(this.validationMessages);
   }
 
   ngOnInit(): void {
 
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, CustomValidators.rangeLength([6, 15])]],
+      password: ['', [Validators.required, CustomValidators.rangeLength([6, 15])]]
     });
   }
 
   ngAfterViewInit(): void {
-    let controlBlurs: Observable<any>[] = this.formInputElements
-      .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
-
-    merge(...controlBlurs).subscribe(() => {
-      this.displayMessage = this.genericValidator.processarMensagens(this.loginForm);
-      this.possuiMudancasNaoSalvas = true;
-    });
+    super.configurarValidacaoFormularioBase(this.formInputElements, this.loginForm);
   }
 
-
   login() {
-    if (this.loginForm.valid && this.loginForm.dirty) {
-      this.usuario = Object.assign({}, this.loginForm.value);
+    if (this.loginForm.dirty && this.loginForm.valid) {
+      this.usuario = Object.assign({}, this.usuario, this.loginForm.value);
+
       this.contaService.login(this.usuario)
         .subscribe(
           sucesso => { this.processarSucesso(sucesso) },
@@ -91,27 +77,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.errors = [];
 
     this.contaService.LocalStorage.salvarDadosLocaisUsuario(response);
-    let toast = this.toastr.success(
-      'login realizado com sucesso!',
-      'Seja bem vindo!!!',
-      {
-        timeOut: 1000,
-      }
-    );
-    if (toast) {
-      toast.onHidden
-        .subscribe(() => {
-          this.returnUrl
-            ? this.router.navigate([this.returnUrl])
-            : this.router.navigate(['/home']);
-        });
 
-      this.possuiMudancasNaoSalvas = false;
+    let toast = this.toastr.success('Login realizado com Sucesso!', 'Bem vindo!!!');
+    if (toast) {
+      toast.onHidden.subscribe(() => {
+        this.returnUrl
+          ? this.router.navigate([this.returnUrl])
+          : this.router.navigate(['/home']);
+      });
     }
   }
 
-  processarFalha(falha: any) {
-    this.errors = falha.error.errors;
-    this.toastr.error('Ocorreu um erro', 'opa :(');
+  processarFalha(fail: any) {
+    this.errors = fail.error.errors;
+    this.toastr.error('Ocorreu um erro!', 'Opa :(');
   }
 }

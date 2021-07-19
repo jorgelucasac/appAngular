@@ -1,41 +1,33 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChildren } from '@angular/core';
-import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, AfterViewInit, ViewChildren, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormControl, FormControlName } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CustomValidators } from 'ng2-validation';
+
 import { ToastrService } from 'ngx-toastr';
-import { fromEvent, merge, Observable } from 'rxjs';
-import { DisplayMessage, GenericValidator, ValidationMessages } from 'src/app/utils/generic-form-validation';
+
 import { Usuario } from '../models/usuario';
 import { ContaService } from '../services/conta.service';
 
+import { FormBaseComponent } from 'src/app/base-components/form-base.component';
+import { CustomValidators } from 'ng2-validation';
+
 @Component({
   selector: 'app-cadastro',
-  templateUrl: './cadastro.component.html',
-  styles: [
-  ]
+  templateUrl: './cadastro.component.html'
 })
-export class CadastroComponent implements OnInit, AfterViewInit {
+export class CadastroComponent extends FormBaseComponent implements OnInit, AfterViewInit {
 
-  @ViewChildren(FormControlName, { read: ElementRef })
-  formInputElements: ElementRef[];
-
-  possuiMudancasNaoSalvas: boolean;
+  @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
 
   errors: any[] = [];
   cadastroForm: FormGroup;
   usuario: Usuario;
 
-  validationMessages: ValidationMessages;
-  genericValidator: GenericValidator;
-  displayMessage: DisplayMessage = {};
-
-  constructor(
-    private fb: FormBuilder,
+  constructor(private fb: FormBuilder,
     private contaService: ContaService,
     private router: Router,
-    private toastr: ToastrService
-  ) {
+    private toastr: ToastrService) {
 
+    super();
 
     this.validationMessages = {
       email: {
@@ -53,14 +45,14 @@ export class CadastroComponent implements OnInit, AfterViewInit {
       }
     };
 
-    this.genericValidator = new GenericValidator(this.validationMessages);
-
+    super.configurarMensagensValidacaoBase(this.validationMessages);
   }
 
   ngOnInit(): void {
 
     let senha = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 15])]);
     let senhaConfirm = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 15]), CustomValidators.equalTo(senha)]);
+
     this.cadastroForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: senha,
@@ -69,23 +61,20 @@ export class CadastroComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    let controlBlurs: Observable<any>[] = this.formInputElements
-      .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
-
-    merge(...controlBlurs).subscribe(() => {
-      this.displayMessage = this.genericValidator.processarMensagens(this.cadastroForm);
-      this.possuiMudancasNaoSalvas = true;
-    });
+    super.configurarValidacaoFormularioBase(this.formInputElements, this.cadastroForm);
   }
 
   adicionarConta() {
-    if (this.cadastroForm.valid && this.cadastroForm.dirty) {
-      this.usuario = Object.assign({}, this.cadastroForm.value);
+    if (this.cadastroForm.dirty && this.cadastroForm.valid) {
+      this.usuario = Object.assign({}, this.usuario, this.cadastroForm.value);
+
       this.contaService.registrarUsuario(this.usuario)
         .subscribe(
           sucesso => { this.processarSucesso(sucesso) },
           falha => { this.processarFalha(falha) }
         );
+
+      this.mudancasNaoSalvas = false;
     }
   }
 
@@ -94,25 +83,17 @@ export class CadastroComponent implements OnInit, AfterViewInit {
     this.errors = [];
 
     this.contaService.LocalStorage.salvarDadosLocaisUsuario(response);
-    let toast = this.toastr.success(
-      'Registro realizado com sucesso!',
-      'Seja bem vindo!!!',
-      {
-        timeOut: 2000,
-      }
-    );
-    if (toast) {
-      toast.onHidden
-        .subscribe(() => {
-          this.router.navigate(['/home']);
-        });
 
-      this.possuiMudancasNaoSalvas = false;
+    let toast = this.toastr.success('Registro realizado com Sucesso!', 'Bem vindo!!!');
+    if (toast) {
+      toast.onHidden.subscribe(() => {
+        this.router.navigate(['/home']);
+      });
     }
   }
 
-  processarFalha(falha: any) {
-    this.errors = falha.error.errors;
-    this.toastr.error('Ocorreu um erro', 'opa :(');
+  processarFalha(fail: any) {
+    this.errors = fail.error.errors;
+    this.toastr.error('Ocorreu um erro!', 'Opa :(');
   }
 }
