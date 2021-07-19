@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CustomValidators } from 'ng2-validation';
 import { ToastrService } from 'ngx-toastr';
 import { fromEvent, merge, Observable } from 'rxjs';
@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   errors: any[] = [];
   loginForm: FormGroup;
   usuario: Usuario;
+  returnUrl: string;
 
   validationMessages: ValidationMessages;
   genericValidator: GenericValidator;
@@ -32,6 +33,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private contaService: ContaService,
+    private activateRoute: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService
   ) {
@@ -48,6 +50,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
       }
     };
 
+    this.returnUrl = this.activateRoute.snapshot.queryParams['returnUrl'];
+    console.log(this.returnUrl);
     this.genericValidator = new GenericValidator(this.validationMessages);
 
   }
@@ -97,7 +101,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
     if (toast) {
       toast.onHidden
         .subscribe(() => {
-          this.router.navigate(['/home']);
+          this.returnUrl
+            ? this.router.navigate([this.returnUrl])
+            : this.router.navigate(['/home']);
         });
 
       this.possuiMudancasNaoSalvas = false;
