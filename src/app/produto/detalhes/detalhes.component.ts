@@ -8,8 +8,8 @@ import { environment } from 'src/environments/environment';
   templateUrl: './detalhes.component.html'
 })
 export class DetalhesComponent {
-  imagensUrl: string = environment.imagensUrl;
 
+  imagensUrl: string = environment.imagensUrl;
   produto: Produto;
 
   constructor(private route: ActivatedRoute) {

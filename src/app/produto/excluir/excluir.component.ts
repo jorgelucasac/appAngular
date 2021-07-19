@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './excluir.component.html'
 })
 export class ExcluirComponent {
+
   imagensUrl: string = environment.imagensUrl;
   produto: Produto;
 
@@ -45,4 +46,3 @@ export class ExcluirComponent {
     this.toastr.error('Houve um erro no processamento!', 'Ops! :(');
   }
 }
-
