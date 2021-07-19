@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Produto } from '../models/produto';
-import { ProdutoService } from '../services/produto.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ProdutoService } from '../services/produto.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-lista',
@@ -9,6 +10,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class ListaComponent implements OnInit {
 
+  imagensUrl: string = environment.imagensUrl;
   public produtos: Produto[];
   errorMessage: string;
 

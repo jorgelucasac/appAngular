@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './detalhes.component.html'
 })
 export class DetalhesComponent {
+  imagensUrl: string = environment.imagensUrl;
 
   produto: Produto;
 
